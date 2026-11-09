@@ -1,17 +1,15 @@
-FROM python:3
+FROM python:3.12-slim
 
-ENV VIRTUAL_ENV=/opt/venv
+ENV VIRTUAL_ENV=/opt/venv \
+    TZ=Asia/Kolkata
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+WORKDIR /srv
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
 COPY . .
 
-COPY requirements.txt .
-
-RUN pip install --upgrade-pip
-RUN pip install -r requirements.txt
-
 EXPOSE 5000
-
-COPY app.py .
 CMD ["python", "./app.py"]
-
