@@ -6,93 +6,156 @@
   <title>Home</title>
   <style>
     :root {
-      --bg: #0b0b0d;
+      --bg: #09090b;
       --text: #f5f5f7;
-      --muted: #8e8e93;
-      --focus-ring: rgba(255, 255, 255, 0.9);
+      --muted: rgba(245, 245, 247, 0.6);
+      --glow: #2f4bd6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
-      background: radial-gradient(ellipse at top, #1c1c22 0%, var(--bg) 60%);
+      background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+      font-family: -apple-system, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, "Noto Sans Devanagari", Arial, sans-serif;
       overflow: hidden;
       cursor: default;
     }
-    .screen {
-      height: 100%;
-      padding: 5vh 6vw;
+
+    /* Featured banner: fills the top of the screen and takes the colour
+       of whichever app is highlighted. */
+    .hero {
+      position: absolute;
+      inset: 0 0 38vh 0;
+      padding: 6vh 6vw;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      background:
+        radial-gradient(ellipse 70% 90% at 75% 20%, var(--glow) 0%, transparent 65%),
+        linear-gradient(180deg, transparent 55%, var(--bg) 100%);
+      transition: background 0.5s ease;
     }
-    header {
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(9, 9, 11, 0.85) 0%, rgba(9, 9, 11, 0.2) 60%, transparent 100%);
+      pointer-events: none;
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-    }
-    .greeting { font-size: 3vw; font-weight: 600; letter-spacing: -0.02em; }
-    .sub { font-size: 1.3vw; color: var(--muted); margin-top: 0.6vh; }
-    .clock { text-align: right; }
-    .time { font-size: 3vw; font-weight: 300; font-variant-numeric: tabular-nums; }
-    .date { font-size: 1.3vw; color: var(--muted); margin-top: 0.6vh; }
-
-    .row-title {
+      align-items: center;
       font-size: 1.4vw;
-      font-weight: 600;
       color: var(--muted);
-      margin: auto 0 2.5vh;
     }
+    .topbar .hello { color: var(--text); font-weight: 600; }
+    .topbar .time { color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .feature-label {
+      font-size: 1.1vw;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2vh;
+    }
+    .feature-name {
+      font-size: 5.2vw;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .feature-tagline {
+      font-size: 1.7vw;
+      color: var(--muted);
+      margin-top: 1.6vh;
+      max-width: 45vw;
+    }
+    .fade { animation: fade 0.35s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(1vh); } to { opacity: 1; transform: none; } }
+
+    /* App row */
+    .apps {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 38vh;
+      padding: 3vh 6vw 0;
+    }
+    .row-title { font-size: 1.3vw; font-weight: 600; color: var(--muted); margin-bottom: 2.4vh; }
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2.5vw;
-      margin-bottom: 4vh;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 1.6vw;
     }
     .tile {
-      aspect-ratio: 16 / 9;
-      border-radius: 1.2vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4vh;
+      text-decoration: none;
+      color: var(--muted);
+      outline: none;
+    }
+    .icon {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8vw;
-      font-weight: 600;
+      font-size: 3.4vw;
+      font-weight: 700;
       color: var(--text);
-      text-decoration: none;
-      box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.4);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-      outline: none;
+      background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 55%);
+      box-shadow: 0 0.8vw 1.6vw rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .tile:focus, .tile:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 0 0.25vw var(--focus-ring), 0 2vw 4vw rgba(0, 0, 0, 0.6);
-      z-index: 1;
+    .label { font-size: 1.1vw; transition: color 0.2s ease; white-space: nowrap; }
+    .tile:focus .icon, .tile:hover .icon {
+      transform: scale(1.14) translateY(-0.6vh);
+      box-shadow: 0 0 0 0.22vw rgba(255, 255, 255, 0.85), 0 1.8vw 3vw rgba(0, 0, 0, 0.6);
     }
-    footer { font-size: 1vw; color: var(--muted); text-align: center; }
+    .tile:focus .label, .tile:hover .label { color: var(--text); }
+
+    .hint {
+      position: absolute;
+      bottom: 3vh;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 0.95vw;
+      color: rgba(245, 245, 247, 0.35);
+    }
   </style>
 </head>
 <body>
-  <main class="screen">
-    <header>
-      <div>
-        <div class="greeting" id="greeting">Namaste</div>
-        <div class="sub">What would you like to watch?</div>
-      </div>
-      <div class="clock">
-        <div class="time" id="time">--:--</div>
-        <div class="date" id="date">&nbsp;</div>
-      </div>
-    </header>
+  <section class="hero" id="hero">
+    <div class="topbar">
+      <div><span class="hello" id="greeting">नमस्ते</span> &nbsp;·&nbsp; <span id="date">&nbsp;</span></div>
+      <div class="time" id="time">--:--</div>
+    </div>
+    <div id="feature">
+      <div class="feature-label">Featured</div>
+      <div class="feature-name" id="feature-name">{{ apps[0].name }}</div>
+      <div class="feature-tagline" id="feature-tagline">{{ apps[0].tagline }}</div>
+    </div>
+  </section>
 
+  <section class="apps">
     <h2 class="row-title">Apps</h2>
-    <nav class="grid" id="grid">
+    <nav class="grid">
       {% for app in apps %}
-      <a class="tile" href="{{ app.url }}" style="background: {{ app.color }}" tabindex="0">{{ app.name }}</a>
+      <a class="tile" href="{{ app.url }}" tabindex="0"
+         data-name="{{ app.name }}" data-tagline="{{ app.tagline }}" data-glow="{{ app.glow }}">
+        <span class="icon" style="background-color: {{ app.color }}">{{ app.name[0] }}</span>
+        <span class="label">{{ app.name }}</span>
+      </a>
       {% endfor %}
     </nav>
+  </section>
 
-    <footer>Use the arrow keys on your remote to move, and OK to open.</footer>
-  </main>
+  <div class="hint">◀ ▶ to move · OK to open</div>
 
   <script>
     // Clock and greeting in India Standard Time.
@@ -105,28 +168,41 @@
         now.toLocaleDateString("en-IN", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
       var hour = parseInt(now.toLocaleString("en-GB", { timeZone: TZ, hour: "2-digit", hour12: false }), 10);
       var part = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-      document.getElementById("greeting").textContent = "Namaste · " + part;
+      document.getElementById("greeting").textContent = "नमस्ते · " + part;
     }
     tick();
     setInterval(tick, 15000);
 
+    // Featured banner follows the highlighted app.
+    var hero = document.getElementById("hero");
+    var feature = document.getElementById("feature");
+    var nameEl = document.getElementById("feature-name");
+    var taglineEl = document.getElementById("feature-tagline");
+    function showFeature(tile) {
+      if (nameEl.textContent === tile.dataset.name && hero.style.getPropertyValue("--glow")) return;
+      nameEl.textContent = tile.dataset.name;
+      taglineEl.textContent = tile.dataset.tagline;
+      hero.style.setProperty("--glow", tile.dataset.glow);
+      feature.classList.remove("fade");
+      void feature.offsetWidth; // restart the animation
+      feature.classList.add("fade");
+    }
+
     // Remote control navigation (arrow keys + OK).
     var tiles = Array.prototype.slice.call(document.querySelectorAll(".tile"));
-    var COLS = 4;
     var index = 0;
     function focusTile(i) {
       if (i < 0 || i >= tiles.length) return;
       index = i;
       tiles[index].focus();
+      showFeature(tiles[index]);
     }
     document.addEventListener("keydown", function (e) {
       var k = e.keyCode;
       if (k === 37) focusTile(index - 1);          // left
       else if (k === 39) focusTile(index + 1);     // right
-      else if (k === 38) focusTile(index - COLS);  // up
-      else if (k === 40) focusTile(index + COLS);  // down
       else if (k === 13) { tiles[index].click(); } // OK
-      else return;
+      else if (k !== 38 && k !== 40) return;
       e.preventDefault();
     });
     tiles.forEach(function (t, i) {
